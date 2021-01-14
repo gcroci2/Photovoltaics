@@ -3,13 +3,13 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-Exploring photovoltaics and weather data, taken from https://data.london.gov.uk/dataset/photovoltaic--pv--solar-panel-energy-generation-data.
+Exploring photovoltaics (pv) and weather data, taken from https://data.london.gov.uk/dataset/photovoltaic--pv--solar-panel-energy-generation-data.
 
 <!-- REPO FOLDERS -->
 ## Repo folders
 
-- `data`: TenMinDataCustomerEndpoints.xlsx, WeatherData2014-11-30.xlsx, customer.feather, weather.feather. 
-_Feather is a file format for fast data frame storage that utilizes the Arrow IPC format internally._
+- `data`: TenMinDataCustomerEndpoints.xlsx, WeatherData2014-11-30.xlsx, customer.feather, customer_cleansed.feather, weather.feather, weather_cleansed.feather. 
+_Feather is a file format for fast data frame storage that utilizes the Arrow IPC format internally._ `locations.txt` contains geocoordinates of pv stations/sites.
 
 <!-- REPO FILES -->
 ## Repo files
