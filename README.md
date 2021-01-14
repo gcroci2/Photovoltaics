@@ -27,6 +27,6 @@ Go to https://pvappgiulia.herokuapp.com/ to explore pv customers and relative we
 <!-- CONTACT -->
 ## Contact
 
-Giulia Crocioni - [@CrocioniGiulia](https://twitter.com/twitter_handle) - crocioni.giulia@gmail.com
+Giulia Crocioni - [@CrocioniGiulia](https://twitter.com/CrocioniGiulia) - crocioni.giulia@gmail.com
 
-Project Link: [https://github.com/gcroci2/Photovoltaics](https://github.com/github_username/repo_name)
+Project Link: [https://github.com/gcroci2/Photovoltaics](https://github.com/gcroci2/Photovoltaics)
