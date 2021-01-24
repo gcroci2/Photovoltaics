@@ -6,13 +6,10 @@ import dash_core_components as dcc
 import dash_html_components as html
 from dash_extensions import Download
 from dash_extensions.snippets import send_data_frame
-from dash.dependencies import Input, Output
+from dash.dependencies import Input, Output, State
 import numpy as np
 import pandas
 import json
-
-button1_state = 0
-button2_state = 0
 
 customer_feather = 'data/customer_cleansed.feather'
 weather_feather = 'data/weather_cleansed.feather'
@@ -146,38 +143,30 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children 
 ###########
 @app.callback(Output("download1", "data"),
 [Input("btn1", "n_clicks"),
-Input('subs_ticker', 'value'),
-Input('signal1_ticker', 'value')])
+State('subs_ticker', 'value'),
+State('signal1_ticker', 'value')])
 def func(n_clicks, selected_subs, selected_sig1):
-    global button1_state
-    if n_clicks is not None:
-        if n_clicks > button1_state:
-            selected_sig1.append('Substation')
-            selected_sig1.append('datetime')
-            sel_customer = customer[selected_sig1]
-            sel_customer = sel_customer[sel_customer['Substation'].isin(selected_subs)]
 
-            button1_state += 1
+    selected_sig1.append('Substation')
+    selected_sig1.append('datetime')
+    sel_customer = customer[selected_sig1]
+    sel_customer = sel_customer[sel_customer['Substation'].isin(selected_subs)]
 
-            return send_data_frame(sel_customer.to_excel, "substations.xls", index=False)
+    return send_data_frame(sel_customer.to_excel, "substations.xls", index=False)
 
 
 @app.callback(Output("download2", "data"),
 [Input("btn2", "n_clicks"),
-Input('sites_ticker', 'value'),
-Input('signal2_ticker', 'value')])
+State('sites_ticker', 'value'),
+State('signal2_ticker', 'value')])
 def func(n_clicks, selected_sites, selected_sig2):
-    global button2_state
-    if n_clicks is not None:
-        if n_clicks > button2_state:
-            selected_sig2.append('Site')
-            selected_sig2.append('datetime')
-            sel_weather = weather[selected_sig2]
-            sel_weather = sel_weather[sel_weather['Site'].isin(selected_sites)]
 
-            button2_state += 1
+    selected_sig2.append('Site')
+    selected_sig2.append('datetime')
+    sel_weather = weather[selected_sig2]
+    sel_weather = sel_weather[sel_weather['Site'].isin(selected_sites)]
 
-            return send_data_frame(sel_weather.to_excel, "weather.xls", index=False)
+    return send_data_frame(sel_weather.to_excel, "weather.xls", index=False)
 ################
 
 @app.callback(Output('map', 'figure'),
