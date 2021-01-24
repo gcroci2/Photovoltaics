@@ -4,10 +4,15 @@ from plotly.subplots import make_subplots
 from jupyter_dash import JupyterDash
 import dash_core_components as dcc
 import dash_html_components as html
+from dash_extensions import Download
+from dash_extensions.snippets import send_data_frame
 from dash.dependencies import Input, Output
 import numpy as np
 import pandas
 import json
+
+button1_state = 0
+button2_state = 0
 
 customer_feather = 'data/customer_cleansed.feather'
 weather_feather = 'data/weather_cleansed.feather'
@@ -23,7 +28,7 @@ with open('data/locations.txt') as json_file:
 # Build App
 external_stylesheets = ['https://codepen.io/chriddyp/pen/bWLwgP.css']
 
-app = JupyterDash(__name__, external_stylesheets=external_stylesheets)
+app = JupyterDash(__name__, external_stylesheets=external_stylesheets, prevent_initial_callbacks=True)
 
 server = app.server
 
@@ -111,6 +116,17 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children 
                         style={'color': colors['text']},
                     ),
                 ], style={"width": "85%"}),
+
+                html.H3('Download displayed traces:', style={'paddingRight': '30px', 'fontSize': 18, 'color': colors['text']}),
+                html.Div([
+                    html.Div([
+                        html.Button("Substations Traces", id="btn1"), Download(id="download1")
+                    ], className="six columns", style={"width": "20%", 'color': colors['text']}),
+                    html.Div([
+                        html.Button("Weather Traces", id="btn2"), Download(id="download2")
+                    ], className="six columns", style={"width": "20%", 'color': colors['text'], 'padding-left':'25%'})
+                ], className="row"),
+
             ], className="six columns"),
             #------------------
 
@@ -185,6 +201,43 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children 
 
 ])
 
+###########
+@app.callback(Output("download1", "data"),
+[Input("btn1", "n_clicks"),
+Input('subs_ticker', 'value'),
+Input('signal1_ticker', 'value')])
+def func(n_clicks, selected_subs, selected_sig1):
+    global button1_state
+    if n_clicks is not None:
+        if n_clicks > button1_state:
+            selected_sig1.append('Substation')
+            selected_sig1.append('datetime')
+            sel_customer = customer[selected_sig1]
+            sel_customer = sel_customer[sel_customer['Substation'].isin(selected_subs)]
+
+            button1_state += 1
+
+            return send_data_frame(sel_customer.to_excel, "substations.xls", index=False)
+
+
+@app.callback(Output("download2", "data"),
+[Input("btn2", "n_clicks"),
+Input('sites_ticker', 'value'),
+Input('signal2_ticker', 'value')])
+def func(n_clicks, selected_sites, selected_sig2):
+    global button2_state
+    if n_clicks is not None:
+        if n_clicks > button2_state:
+            selected_sig2.append('Site')
+            selected_sig2.append('datetime')
+            sel_weather = weather[selected_sig2]
+            sel_weather = sel_weather[sel_weather['Site'].isin(selected_sites)]
+
+            button2_state += 1
+
+            return send_data_frame(sel_weather.to_excel, "weather.xls", index=False)
+################
+
 @app.callback(Output('map', 'figure'),
 [Input('subs_ticker', 'value'),
 Input('sites_ticker', 'value')])
@@ -241,7 +294,6 @@ Input('sites_ticker', 'value'),
 Input('signal2_ticker', 'value'),
 Input('ratio_ticker', 'value')])
 def update_graph(selected_subs, selected_sig1, selected_sites, selected_sig2, selected_ratios):
-
     fig = go.Figure()
 
     for x in selected_subs:
