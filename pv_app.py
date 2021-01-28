@@ -91,28 +91,15 @@ app.layout = html.Div(style={'backgroundColor': colors['background']}, children 
                         dcc.Dropdown(
                             id='signal2_ticker',
                             options=[
-                                {'label': i, 'value': i} for i in ['TempOut', 'SolarRad', 'SolarEnergy', 'HiSolarRad']
+                                {'label': i, 'value': i} for i in ['TempOut', 'SolarRad',
+                                'SolarEnergy', 'HiSolarRad', 'OutHum', 'WindSpeed', 'WindDir',
+                                'WindRun', 'Rain']
                                 ], multi=True,
                             value=[],
                             style={'color': colors['text']},
                         ),
                     ], style={"width": "40%"}, className="six columns")
                 ], className="row"),
-
-                html.Div([
-                    html.H3('Ratios:', style={'paddingRight': '30px', 'fontSize': 18, 'color': colors['text']}),
-                    dcc.Dropdown(
-                        id='ratio_ticker',
-                        options=[
-                            {'label': i, 'value': i} for i in [
-                                'P_GEN/SolarRad', 'P_GEN/SolarEnergy',
-                                'Q_GEN/SolarRad', 'Q_GEN/SolarEnergy',
-                                'S_GEN/SolarRad', 'S_GEN/SolarEnergy']
-                            ], multi=True,
-                        value=[],
-                        style={'color': colors['text']},
-                    ),
-                ], style={"width": "85%"}),
 
                 html.H3('Download displayed traces:', style={'paddingRight': '30px', 'fontSize': 18, 'color': colors['text']}),
                 html.Div([
@@ -152,7 +139,7 @@ def func(n_clicks, selected_subs, selected_sig1):
     sel_customer = customer[selected_sig1]
     sel_customer = sel_customer[sel_customer['Substation'].isin(selected_subs)]
 
-    return send_data_frame(sel_customer.to_excel, "substations.xls", index=False)
+    return send_data_frame(sel_customer.to_csv, "substations.csv", index=False)
 
 
 @app.callback(Output("download2", "data"),
@@ -161,12 +148,12 @@ State('sites_ticker', 'value'),
 State('signal2_ticker', 'value')])
 def func(n_clicks, selected_sites, selected_sig2):
 
-    selected_sig2.append('Site')
-    selected_sig2.append('datetime')
-    sel_weather = weather[selected_sig2]
-    sel_weather = sel_weather[sel_weather['Site'].isin(selected_sites)]
+        selected_sig2.append('Site')
+        selected_sig2.append('datetime')
+        sel_weather = weather[selected_sig2]
+        sel_weather = sel_weather[sel_weather['Site'].isin(selected_sites)]
 
-    return send_data_frame(sel_weather.to_excel, "weather.xls", index=False)
+        return send_data_frame(sel_weather.to_csv, "weather.csv", index=False)
 ################
 
 @app.callback(Output('map', 'figure'),
@@ -222,9 +209,9 @@ def update_map(selected_subs, selected_sites):
 [Input('subs_ticker', 'value'),
 Input('signal1_ticker', 'value'),
 Input('sites_ticker', 'value'),
-Input('signal2_ticker', 'value'),
-Input('ratio_ticker', 'value')])
-def update_graph(selected_subs, selected_sig1, selected_sites, selected_sig2, selected_ratios):
+Input('signal2_ticker', 'value')
+])
+def update_graph(selected_subs, selected_sig1, selected_sites, selected_sig2):
     fig = go.Figure()
 
     for x in selected_subs:
@@ -236,15 +223,6 @@ def update_graph(selected_subs, selected_sig1, selected_sites, selected_sig2, se
         for y in selected_sig2:
             fig.add_trace(go.Scattergl(x=weather[weather.Site == x].datetime, y=weather[weather.Site == x][y],
             name = str(x) + ' ' + str(y)))
-
-    for sub in selected_subs:
-        for site in selected_sites:
-            for ratio in selected_ratios: # P_GEN/SolarRad
-                weather_upsampled = weather[weather.Site == site].set_index('datetime').resample('10T').asfreq().reset_index()
-                denom = weather_upsampled[ratio[6:]]
-                num = customer[customer.Substation == sub][ratio[0:5]]
-                fig.add_trace(go.Scattergl(x=customer[customer.Substation == sub].datetime, y=num.divide(denom).replace(np.inf, 0),
-                name = str(sub) + ' ' + str(ratio[0:5]) + '\\' + str(site) + ' ' + str(ratio[6:])))
 
     fig.update_traces(
         line={"width": 0.5},
