@@ -16,7 +16,8 @@ _Feather is a file format for fast data frame storage that utilizes the Arrow IP
 - `.gitignore`
 - `requirements.txt` for Python dependencies.
 - `Procfile` for deployment on Heroku.
-- `pv_analysis.ipynb` for data analysis and Heroku app development.
+- `dash_for_pv_app.ipynb` different dash versions for Heroku app.
+- `data_cleansing.ipynb` data exploration, visualization and cleansing
 - `pv_app.py` for the Heroku [app](https://pvappgiulia.herokuapp.com/).
 
 <!-- USAGE EXAMPLES -->
